@@ -16,3 +16,10 @@ goreleaser release --clean --snapshot
 git tag -f "$TAG"
 git push --tags
 ```
+
+### install via homebrew
+
+```sh
+export TAG=v0.0.0
+brew install "$(rb="$(mktemp -d)/ytt-ext.rb"; curl -o "$rb" "https://raw.githubusercontent.com/marxus/ytt-ext/main/brew/$TAG/ytt-ext.rb"; echo "$rb")"
+```
