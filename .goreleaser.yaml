@@ -1,0 +1,44 @@
+version: 1
+
+before:
+  hooks:
+    - |
+      bash -ce '
+        rm -rf ytt && git clone https://github.com/carvel-dev/ytt.git --branch ${TAG:-v{{ .Version }}} --depth 1 ytt && cd ytt
+        cp -r ../ext/. .
+        hack/patch-code.sh
+        hack/build-binaries.sh
+      '
+
+builds:
+  - gobinary: "true"
+    no_main_check: true
+
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+    no_unique_dist_dir: true
+    binary: "ytt-{{ .Os }}-{{ .Arch }}"
+    hooks:
+      post: |
+        bash -ce 'cp "ytt/ytt-{{ .Os }}-{{ .Arch }}$([ {{ .Os }} == windows ] && echo .exe)" dist'
+
+archives:
+  - format: binary
+    name_template: "ytt-{{ .Os }}-{{ .Arch }}"
+
+brews:
+  - repository:
+      owner: marxus
+      name: ytt-ext
+    folder: brew/$TAG
+    install: |
+      bin.install stable.url.split("/")[-1] => "ytt"
