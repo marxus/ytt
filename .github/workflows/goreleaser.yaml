@@ -1,6 +1,6 @@
 name: goreleaser
 
-!!str on: { push: { tags: ["*"] } }
+"on": { push: { tags: ["*"] } }
 
 permissions: { contents: write }
 
@@ -17,9 +17,8 @@ jobs:
         run: "cat <<<\"$(cat .goreleaser.yaml | env TAG=${{ github.ref_name }} envsubst '$TAG')\" >.goreleaser.yaml"
       - name: "Run GoReleaser"
         uses: goreleaser/goreleaser-action@v5
+        env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
         with:
           distribution: goreleaser
           version: latest
           args: "release --clean --skip=validate"
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

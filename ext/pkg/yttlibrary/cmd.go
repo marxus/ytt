@@ -27,17 +27,18 @@ var (
 type cmdModule struct{}
 
 func (cmdModule) Run(thread *starlark.Thread, f *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
-	if args.Len() == 0 {
+	len := args.Len()
+	if len == 0 {
 		return starlark.None, fmt.Errorf("expected at least one argument")
 	}
 
-	var vals []string
-	for i := 0; i < args.Len(); i++ {
+	vals := make([]string, len)
+	for i := 0; i < len; i++ {
 		val, err := core.NewStarlarkValue(args.Index(i)).AsString()
 		if err != nil {
 			return starlark.None, err
 		}
-		vals = append(vals, val)
+		vals[i] = val
 	}
 
 	key := strings.Join(vals, "")
