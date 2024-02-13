@@ -8,15 +8,12 @@ jobs:
   goreleaser:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
-      - name: "Setup Go"
-        uses: actions/setup-go@v4
-      - name: "Fix Homebrew"
-        run: "cat <<<\"$(cat .goreleaser.yaml | env TAG=${{ github.ref_name }} envsubst '$TAG')\" >.goreleaser.yaml"
-      - name: "Run GoReleaser"
-        uses: goreleaser/goreleaser-action@v5
+      - uses: actions/setup-go@v4
+      - uses: cachix/install-nix-action@v22
+      - run: 'cat <<<"$(cat .goreleaser.yaml | env TAG=${{ github.ref_name }} envsubst ''$TAG'')" >.goreleaser.yaml'
+      - uses: goreleaser/goreleaser-action@v5
         env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
         with:
           distribution: goreleaser

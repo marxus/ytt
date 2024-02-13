@@ -32,8 +32,8 @@ builds:
         bash -ce 'cp "ytt/ytt-{{ .Os }}-{{ .Arch }}$([ {{ .Os }} == windows ] && echo .exe)" dist'
 
 archives:
-  - format: binary
-    name_template: "ytt-{{ .Os }}-{{ .Arch }}"
+  - name_template: "ytt-{{ .Os }}-{{ .Arch }}"
+    files: ["_-_-_*_-_-_"]
 
 brews:
   - repository:
@@ -41,4 +41,13 @@ brews:
       name: ytt-ext
     folder: brew/$TAG
     install: |
-      bin.install stable.url.split("/")[-1] => "ytt"
+      bin.install stable.url.split("/")[-1].split(".")[0] => "ytt"
+
+nix:
+  - repository:
+      owner: marxus
+      name: ytt-ext
+    path: "nix/{{ .Tag }}.nix"
+    install: |
+      mkdir -p $out/bin
+      cp -vr ${lib.nameFromURL urlMap.${system} "."} $out/bin/ytt
